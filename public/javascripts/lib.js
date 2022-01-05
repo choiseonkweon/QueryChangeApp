@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-
-    <link ref="stylesheets" href="public/stylesheets/style.css"/>
-
-    <script>
-        /*임의 데이터 추가*/
-        var ss = 'SELECT tba1.* \n'+
+    window.onload= function(){
+       change.init() ;
+    }
+    var ss = 'SELECT tba1.* \n'+
              '     , tba1.a \n'+
              '     , tba2.b \n'+
              '     , tba2.a \n'+
@@ -34,60 +29,6 @@
              '     , TB_SMPPE001 tba1 \n'+
              '     , TB_SMPCO007 tba2'
 
-        var json = [
-                [   {
-                    "sourceTbId":'TBL_SMPPE002',
-                    "sourceTbNm":'테스트테이블002',
-                    "targetTbId":'TBL_imsiTable02',
-                    "targetTbNm":'투비임시테이블02'
-                    },
-                    {
-                    "rownum" : 0,
-                    "sourceColId": "CD_CODE",
-                    "sourceColNm": "공통코드",
-                    "targetColId": "CM_CD",
-                    "targetColNm": "공통코드",
-                    "mappingLogic":'1:1매핑'
-                    },
-                    {
-                    "rownum" : 1,
-                    "sourceColId": "CD_NM",
-                    "sourceColNm": "공통코드이름",
-                    "targetColId": "CM_NM",
-                    "targetColNm": "공통코드이름",
-                    "mappingLogic":'1:1매핑'
-                    },
-                    {
-                    "rownum" : 2,
-                    "sourceColId": "",
-                    "sourceColNm": "",
-                    "targetColId": "",
-                    "targetColNm": "",
-                    "mappingLogic":'1:1매핑'
-                    }
-                ],
-                [   {
-                    "sourceTbId":'TBL_SMPPE003',
-                    "sourceTbNm":'테스트테이블003',
-                    "targetTbId":'TBL_imsiTable03',
-                    "targetTbNm":'투비임시테이블03'
-                    },
-                    {
-                    "rownum" : 0,
-                    "sourceColId": "SMPP1",
-                    "sourceColNm": "SMPP1",
-                    "targetColId": "IMSI_SMPP1",
-                    "targetColNm": "SMPP1",
-                    "mappingLogic":'1:1매핑'
-                    }
-                ]            
-            ]
-    </script>
-<script>
- 
-    window.onload = function(){
-       change.init() ; 
-    }
     var change = {
         init: function(){
             this.draw();
@@ -123,22 +64,8 @@
             $div_draw.appendChild($text_query);
             document.body.append($div_draw);
 
-            let $rt_query = document.createElement('textarea');
-            $rt_query.id = 'rt_query';
-            $rt_query.cols ='50';
-            $rt_query.rows='50';
-
-            $div_draw.appendChild($rt_query);
-            document.body.append($rt_query);
-
             let $rt = document.createElement('textarea');
             $rt.id = 'rt';
-            $rt.cols ='50';
-            $rt.rows='50';
-
-            document.body.append($rt);
-            $rt = document.createElement('textarea');
-            $rt.id = 'rt2';
             $rt.cols ='50';
             $rt.rows='50';
 
@@ -210,7 +137,7 @@
                     for(c in arr){
                         if(tableAs ==arr[c][1]){
                             if(arr[c-1][1]=='FROM'||arr[c-1][1]==','){
-                                this._data[h].tableName = 'subquery'
+                                this._data[h].tableName = 'subTable_'+arr[c][1]
                             }else{
                                 this._data[h].tableName = arr[parseInt(c)-1][1]
                             }
@@ -219,53 +146,6 @@
                     }
                 }
             }
-            let pix = [];
-            //json data 데이터 뽑기
-            for(x in this._data){
-                data = this._data[x]
-                for(c in json){
-                    if(data.tableName==json[c][0].sourceTbId){
-                        let frm = new Object();
-                        let as = new Object();
-                        let to = new Object();
-                        let frm2 = new Object();
-                        //TABLE 셋팅
-                        as.tableId = json[c][0].sourceTbId;  //테이블명
-                        as.tableNm = json[c][0].sourceTbNm;  //테이블 comment
-                        as.tableAs = data.tableAs;           //as
-
-                        to.tableId = json[c][0].targetTbId;  //테이블명
-                        to.tableNm = json[c][0].targetTbNm;  //테이블 comment
-                        to.tableAs = data.tableAs;           //as
-                        frmto = []
-                        frmas = []
-                        for(v in data.columns){
-                            let $cl = data.columns[v]
-                            //asis add
-                            let rt
-                            for(let j=1; j<json[c].length;j++){
-                                    if($cl==json[c][j].sourceColId){
-                                        rt = json[c][j].targetColId
-                                    }
-                            }
-                            frmas.push($cl)
-                            if(rt=='undefined'){
-                                frmto.push(NULL) 
-                            }else{
-                                frmto.push(rt) 
-                            }
-                        }
-                        as.columns = frmas
-                        to.columns = frmto
-                        frm.as = as
-                        frm.to = to
-                        //컬럼 셋팅
-                        pix.push(frm)
-                    }
-                }
-            }
-            this._data = pix;
-            
 
             this.result()
 
@@ -387,73 +267,29 @@
         },
         result : function(){
 
-            var htmlas = '';
-            var htmlto = '';
-
-            //결과물 출력
-
-            //쿼리 변경
-
-            var xx = ss.toLocaleUpperCase()
-
+            let html = '';
             for(x in this._data){
-            let data = this._data[x]
-                xx = xx.split(data.as.tableId).join(data.to.tableId)
-                for(c in data.as.columns){
-                        console.log(c+': '+data.as.tableAs+'.'+data.as.columns[c])
-                        console.log(c+': '+data.to.tableAs+'.'+data.to.columns[c])
-                    xx = xx.split(data.as.tableAs+'.'+data.as.columns[c])
-                        .join(data.to.tableAs+'.'+data.to.columns[c])
-                }
-            }
-            document.getElementById('rt_query').remove();
-            let $rt_query = document.createElement('textarea');
-            $rt_query.id = 'rt_query';
-            $rt_query.cols ='50';
-            $rt_query.rows='50';
-            document.body.append($rt_query);
-            document.getElementById('rt_query').textContent = xx;
-
-            //컬럼 출력
-            for(x in this._data){
-                data = this._data[x]
-                console.log(data)
-                for(k in data){
-                    let d = data[k]
-                    //테이블명 뽑기
-                    eval('html'+k +'+="' +d.tableId+' '+d.tableAs + ' '+d.tableNm+', "')
-
-                    //컬럼 뽑기
-                    for(let c =0; c< d.columns.length; c++){
-                        let rt = d.columns[c]
-                        if(d.columns[c]==undefined){
-                            rt = 'NULL'
-                        }
-                    eval('html'+k +'+="'+ rt+', "')
+                let $tb = this._data[x]
+                html += '------------------------------------\n'
+                html += '테이블 : ' + $tb.tableName +' AS '+$tb.tableAs +'\n'
+                html += '-columns-\n'
+                for(c in $tb.columns){
+                    if($tb.columns[c]!='*'){
+                        html += c+': ' + $tb.columns[c] +'\n'
                     }
-                eval('html'+k +'+=", "')
-
                 }
+                html += '\n'
             }
-            htmlas = htmlas.split(', ').join('\n')
-            htmlto = htmlto.split(', ').join('\n')
-            
+            console.log(html)
             document.getElementById('rt').remove();
             let $rt = document.createElement('textarea');
             $rt.id = 'rt';
-            $rt.cols ='30';
+            $rt.cols ='50';
             $rt.rows='50';
             document.body.append($rt);
-            document.getElementById('rt').textContent = htmlas;
 
-            document.getElementById('rt2').remove();
-            let $rt2 = document.createElement('textarea');
-            $rt2.id = 'rt2';
-            $rt2.cols ='30';
-            $rt2.rows='50';
-            document.body.append($rt2);
-            document.getElementById('rt2').textContent = htmlto;
-
+            document.getElementById('rt').textContent = ''
+            document.getElementById('rt').textContent = html;
         },
         tableNames:[],
         columns: [],
@@ -486,8 +322,3 @@
                 console.log(param + '정보가 존재하지 않습니다.');
             }
         }   
-    </script>
-</head>
-<body>
-</body>
-</html>
