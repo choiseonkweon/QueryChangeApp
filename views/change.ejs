@@ -115,6 +115,7 @@
             $div_draw.id = 'draw';
             $div_draw.style.float ='left';
 
+            
             let $text_query = document.createElement('textarea');
             $text_query.id = 'query';
             $text_query.cols ='50';
@@ -122,6 +123,7 @@
 
             $div_draw.appendChild($text_query);
             document.body.append($div_draw);
+
 
             let $rt_query = document.createElement('textarea');
             $rt_query.id = 'rt_query';
@@ -131,10 +133,12 @@
             $div_draw.appendChild($rt_query);
             document.body.append($rt_query);
 
+
             let $rt = document.createElement('textarea');
             $rt.id = 'rt';
             $rt.cols ='50';
             $rt.rows='50';
+
 
             document.body.append($rt);
             $rt = document.createElement('textarea');
@@ -143,6 +147,7 @@
             $rt.rows='50';
 
             document.body.append($rt);
+
             //임시 테스트
             document.querySelector('textarea').textContent = ss;
         },
@@ -151,7 +156,7 @@
             this.reload();
             console.log('this.Array Empty!');
             let $query = document.querySelector('#query').value;
-
+            console.log($query)
             //coulmn list
             $query = $query.split(' ').join('$space;&nbsp;$space;')
                            .split(')').join('$space;)$space;')
@@ -390,18 +395,15 @@
             var htmlas = '';
             var htmlto = '';
 
-            //결과물 출력
-
             //쿼리 변경
+            let ss = document.getElementById('query').value;
 
             var xx = ss.toLocaleUpperCase()
-
+            console.log(xx)
             for(x in this._data){
             let data = this._data[x]
                 xx = xx.split(data.as.tableId).join(data.to.tableId)
                 for(c in data.as.columns){
-                        console.log(c+': '+data.as.tableAs+'.'+data.as.columns[c])
-                        console.log(c+': '+data.to.tableAs+'.'+data.to.columns[c])
                     xx = xx.split(data.as.tableAs+'.'+data.as.columns[c])
                         .join(data.to.tableAs+'.'+data.to.columns[c])
                 }
@@ -417,7 +419,7 @@
             //컬럼 출력
             for(x in this._data){
                 data = this._data[x]
-                console.log(data)
+
                 for(k in data){
                     let d = data[k]
                     //테이블명 뽑기
